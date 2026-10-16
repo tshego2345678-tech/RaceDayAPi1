@@ -42,3 +42,4 @@ jobs:
 
       - name: Test
         run: dotnet test "${{ steps.sln.outputs.path }}" --configuration Release --no-build --verbosity normal
+        run: dotnet test "${{ steps.sln.outputs.path }}" --configuration Release --no-build --verbosity normal
