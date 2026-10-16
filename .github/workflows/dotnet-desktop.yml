@@ -1,30 +1,30 @@
 name: .NET CI
-
+ 
 on:
   push:
   pull_request:
   workflow_dispatch:
-
+ 
 jobs:
   build-and-test:
     runs-on: windows-latest
-
+ 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+ 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             8.0.x
             9.0.x
-
+ 
       - name: Show project layout (for debugging)
         shell: pwsh
         run: |
           Get-ChildItem -Recurse -Include *.sln,*.csproj | Select-Object -ExpandProperty FullName
-
+ 
       - name: Find solution
         id: sln
         shell: pwsh
@@ -33,13 +33,13 @@ jobs:
           if (-not $sln) { Write-Error "No .sln file found"; exit 1 }
           "path=$($sln.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           Write-Host "Using solution: $($sln.FullName)"
-
+ 
       - name: Restore
         run: dotnet restore "${{ steps.sln.outputs.path }}"
-
+ 
       - name: Build
         run: dotnet build "${{ steps.sln.outputs.path }}" --configuration Release --no-restore
-
+ 
       - name: Test
         run: dotnet test "${{ steps.sln.outputs.path }}" --configuration Release --no-build --verbosity normal
-        run: dotnet test "${{ steps.sln.outputs.path }}" --configuration Release --no-build --verbosity normal
+ 
