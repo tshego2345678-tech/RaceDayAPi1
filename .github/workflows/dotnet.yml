@@ -1,28 +1,70 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: RaceDay CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ main, master ]
 
 jobs:
-  build:
-
+  validate-structure:
+    name: Validate repo structure
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - uses: actions/checkout@v4
+
+      - name: Check required files and folders
+        run: |
+          missing=0
+          for item in README.md docs; do
+            if [ ! -e "$item" ]; then
+              echo "::error::Missing required item: $item"
+              missing=1
+            fi
+          done
+          if ! ls *.sln >/dev/null 2>&1; then
+            echo "::error::No .sln file found in repo root"
+            missing=1
+          fi
+          if ! ls Dockerfile */Dockerfile >/dev/null 2>&1; then
+            echo "::error::No Dockerfile found"
+            missing=1
+          fi
+          exit $missing
+
+  build-and-test:
+    name: Build and test (API + MVC)
+    runs-on: ubuntu-latest
+    needs: validate-structure
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+  docker-build:
+    name: Docker build
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          if [ -f Dockerfile ]; then
+            docker build -t raceday-mvc:ci .
+          else
+            dockerfile=$(ls */Dockerfile | head -n 1)
+            docker build -t raceday-mvc:ci -f "$dockerfile" .
+          fi
