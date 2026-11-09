@@ -1,0 +1,16 @@
+@model ProfileDto
+@{ ViewData["Title"] = "Profile"; }
+<h2 class="page-title">My profile</h2>
+<div class="row"><div class="col-md-7"><div class="card"><div class="card-body">
+<form asp-action="Profile" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3 text-center">
+        @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl)) { <img src="@Model.ProfilePictureUrl" class="profile-pic" alt="Profile picture" /> }
+        else { <div class="profile-pic d-inline-flex align-items-center justify-content-center bg-dark text-warning fs-1">@(Model.FullName.Length > 0 ? Model.FullName[0] : 'R')</div> }
+    </div>
+    <div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" /><span asp-validation-for="FullName" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" readonly /><span asp-validation-for="Email" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="DateOfBirth" class="form-label"></label><input asp-for="DateOfBirth" type="date" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">Profile picture</label><input type="file" name="picture" accept="image/*" class="form-control" /></div>
+    <button class="btn rd-btn">Save changes</button>
+</form></div></div></div></div>

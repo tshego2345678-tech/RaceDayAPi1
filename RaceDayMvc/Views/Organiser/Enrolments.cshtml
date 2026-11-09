@@ -1,0 +1,11 @@
+@model List<EnrolmentDto>
+@{ ViewData["Title"] = "Enrolments"; }
+<div class="d-flex justify-content-between align-items-center"><h2 class="page-title">Enrolments &mdash; @ViewBag.EventName</h2>
+<a class="btn rd-btn" asp-action="Results" asp-route-id="@ViewBag.EventId">Enter results</a></div>
+@if (!Model.Any()) { <div class="alert alert-secondary">No participants have enrolled yet.</div> }
+else {
+<div class="table-responsive"><table class="table table-striped align-middle bg-white">
+<thead><tr><th>Participant</th><th>Category</th><th>Status</th></tr></thead><tbody>
+@foreach (var e in Model) { <tr><td>@e.ParticipantName</td><td>@e.CategoryName</td><td><partial name="_Status" model="e.Status" /></td></tr> }
+</tbody></table></div> }
+<a asp-action="Events" class="btn btn-link">&larr; Back to events</a>

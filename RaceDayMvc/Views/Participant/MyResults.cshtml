@@ -1,0 +1,16 @@
+@model List<ResultDto>
+@{ ViewData["Title"] = "My Results"; }
+<h2 class="page-title">My results</h2>
+@if (!Model.Any()) { <div class="alert alert-secondary">No results yet. Results appear after organisers publish them.</div> }
+else {
+<div class="table-responsive"><table class="table table-striped align-middle bg-white">
+<thead><tr><th>Event</th><th>Date</th><th>Category</th><th>Finish time</th><th>Position</th></tr></thead>
+<tbody>
+@foreach (var r in Model) {
+    string Ord(int n) => (n % 100 is 11 or 12 or 13) ? n + "th" : (n % 10) switch { 1 => n + "st", 2 => n + "nd", 3 => n + "rd", _ => n + "th" };
+    <tr><td>@r.EventName</td><td>@r.EventDate.ToString("dd MMM yyyy")</td><td>@r.CategoryName</td>
+    @if (r.Status == "Finished" && r.Position.HasValue) { <td><strong>@r.FinishTime</strong></td><td>@Ord(r.Position.Value) out of @r.TotalFinishers finishers</td> }
+    else { <td colspan="2"><span class="status-badge status-cancelled">@r.Status</span></td> }
+    </tr>
+}
+</tbody></table></div> }

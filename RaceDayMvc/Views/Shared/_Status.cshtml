@@ -1,0 +1,12 @@
+@model string
+@{
+    var cls = Model?.ToLower() switch
+    {
+        "confirmed" => "status-confirmed",
+        "pending" => "status-pending",
+        "cancelled" => "status-cancelled",
+        "completed" => "status-completed",
+        _ => "status-pending"
+    };
+}
+<span class="status-badge @cls">@Model</span>

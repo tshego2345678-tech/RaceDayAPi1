@@ -1,0 +1,30 @@
+@model List<EventDto>
+@{ ViewData["Title"] = "Upcoming Events"; }
+<h2 class="page-title">Upcoming events</h2>
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-4"><input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by name" /></div>
+    <div class="col-md-3"><input name="location" value="@ViewBag.Location" class="form-control" placeholder="Location" /></div>
+    <div class="col-md-3">
+        <select name="type" class="form-select">
+            <option value="">All types</option>
+            @foreach (var t in new[] { "Running", "Walking", "Cycling" })
+            { <option value="@t" selected="@((string?)ViewBag.Type == t)">@t</option> }
+        </select>
+    </div>
+    <div class="col-md-2"><button class="btn rd-btn w-100">Filter</button></div>
+</form>
+@if (!Model.Any()) { <div class="alert alert-secondary">No upcoming events match your search.</div> }
+<div class="row g-4">
+@foreach (var e in Model)
+{
+    <div class="col-md-6 col-lg-4"><div class="card h-100">
+        <partial name="_Banner" model="e.BannerUrl" />
+        <div class="card-body d-flex flex-column">
+            <h4 class="mb-1">@e.Name</h4>
+            <div class="text-muted small mb-2">@e.Date.ToString("dd MMM yyyy, HH:mm") &middot; @e.Location</div>
+            <div class="mb-3"><span class="badge bg-dark">@e.EventType</span> <span class="badge bg-secondary">@e.DistanceKm km</span></div>
+            <a class="btn btn-outline-primary mt-auto" asp-action="Details" asp-route-id="@e.Id">View details</a>
+        </div>
+    </div></div>
+}
+</div>

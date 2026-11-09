@@ -1,0 +1,39 @@
+@model EventDetailsVm
+@{ ViewData["Title"] = Model.Event.Name; var role = Context.Session.GetString("Role"); }
+<partial name="_Banner" model="Model.Event.BannerUrl" />
+<h2 class="page-title mt-3">@Model.Event.Name</h2>
+<div class="row g-4">
+    <div class="col-lg-7"><div class="card"><div class="card-body">
+        <p>@Model.Event.Description</p>
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Date</dt><dd class="col-sm-8">@Model.Event.Date.ToString("dddd, dd MMMM yyyy HH:mm")</dd>
+            <dt class="col-sm-4">Location</dt><dd class="col-sm-8">@Model.Event.Location</dd>
+            <dt class="col-sm-4">Distance</dt><dd class="col-sm-8">@Model.Event.DistanceKm km</dd>
+            <dt class="col-sm-4">Type</dt><dd class="col-sm-8">@Model.Event.EventType</dd>
+        </dl>
+    </div></div></div>
+    <div class="col-lg-5"><div class="card">
+        <div class="card-header">Categories &amp; enrolment</div>
+        <div class="card-body">
+        @if (!Model.Categories.Any()) { <p class="text-muted mb-0">No categories have been added yet.</p> }
+        else
+        {
+            <ul class="list-group mb-3">
+                @foreach (var c in Model.Categories) { <li class="list-group-item d-flex justify-content-between align-items-center">@c.Name <span><span class="badge bg-dark">@c.DistanceKm km</span> <span class="badge bg-secondary">R @c.EntryFee.ToString("0.00")</span></span></li> }
+            </ul>
+            @if (role == "Participant")
+            {
+                <form asp-action="Enrol" method="post">
+                    <input type="hidden" name="eventId" value="@Model.Event.Id" />
+                    <select name="categoryId" class="form-select mb-3" required>
+                        <option value="">Select a category</option>
+                        @foreach (var c in Model.Categories) { <option value="@c.Id">@c.Name (@c.DistanceKm km, R @c.EntryFee.ToString("0.00"))</option> }
+                    </select>
+                    <button class="btn rd-btn w-100">Enrol now</button>
+                </form>
+            }
+        }
+        </div>
+    </div></div>
+</div>
+<a asp-action="Index" class="btn btn-link mt-3">&larr; Back to events</a>

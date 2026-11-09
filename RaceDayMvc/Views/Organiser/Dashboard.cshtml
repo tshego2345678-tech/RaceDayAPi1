@@ -1,0 +1,20 @@
+@model List<EventDto>
+@{ ViewData["Title"] = "Dashboard"; var upcoming = Model.Where(e => e.Date >= DateTime.Today).ToList(); }
+<h2 class="page-title">Organiser dashboard</h2>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="stat-card"><div class="num">@Model.Count</div>Events created</div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="num">@Model.Sum(e => e.EnrolmentCount)</div>Total enrolments</div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="num">@upcoming.Count</div>Upcoming events</div></div>
+</div>
+<div class="card"><div class="card-header">My events</div>
+<div class="table-responsive"><table class="table mb-0 align-middle">
+<thead><tr><th>Event</th><th>Date</th><th>Enrolments</th><th>Status</th><th></th></tr></thead>
+<tbody>
+@foreach (var e in Model.OrderBy(e => e.Date))
+{
+    <tr><td>@e.Name</td><td>@e.Date.ToString("dd MMM yyyy")</td><td>@e.EnrolmentCount</td>
+    <td><partial name="_Status" model="@(e.Date >= DateTime.Today ? "Confirmed" : "Completed")" /></td>
+    <td class="text-end"><a class="btn btn-sm btn-outline-primary" asp-action="Enrolments" asp-route-id="@e.Id">Enrolments</a></td></tr>
+}
+@if (!Model.Any()) { <tr><td colspan="5" class="text-muted text-center py-3">No events yet. <a asp-action="CreateEvent">Create your first event</a></td></tr> }
+</tbody></table></div></div>

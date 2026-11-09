@@ -1,0 +1,26 @@
+@model ResultsEntryVm
+@{ ViewData["Title"] = "Results"; }
+<h2 class="page-title">Results &mdash; @Model.EventName</h2>
+@if (!Model.Rows.Any()) { <div class="alert alert-secondary">There are no enrolled participants to capture results for.</div> }
+else {
+<form asp-action="Results" method="post">
+    <input type="hidden" asp-for="EventId" /><input type="hidden" asp-for="EventName" />
+    <div class="table-responsive"><table class="table align-middle bg-white">
+    <thead><tr><th>Participant</th><th>Category</th><th style="width:150px">Status</th><th style="width:170px">Finish time (hh:mm:ss)</th><th style="width:120px">Position</th></tr></thead><tbody>
+    @for (int i = 0; i < Model.Rows.Count; i++)
+    {
+        <tr>
+            <td>@Model.Rows[i].ParticipantName
+                <input type="hidden" asp-for="Rows[i].EnrolmentId" /><input type="hidden" asp-for="Rows[i].ResultId" />
+                <input type="hidden" asp-for="Rows[i].ParticipantName" /><input type="hidden" asp-for="Rows[i].CategoryName" /></td>
+            <td>@Model.Rows[i].CategoryName</td>
+            <td><select asp-for="Rows[i].Status" class="form-select"><option>Finished</option><option>DNF</option><option>DSQ</option></select></td>
+            <td><input asp-for="Rows[i].FinishTime" class="form-control" placeholder="01:45:30" /></td>
+            <td><input asp-for="Rows[i].Position" type="number" min="1" class="form-control" /></td>
+        </tr>
+    }
+    </tbody></table></div>
+    <p class="small text-muted">Finished runners need a finish time and a unique position. DNF/DSQ rows need neither. Saving again updates existing results.</p>
+    <button class="btn rd-btn">Publish results</button>
+    <a asp-action="Enrolments" asp-route-id="@Model.EventId" class="btn btn-link">Cancel</a>
+</form> }
